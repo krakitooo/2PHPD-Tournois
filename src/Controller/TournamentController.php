@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Tournament;
+use App\Entity\User;
 use App\Repository\TournamentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,9 +34,26 @@ class TournamentController extends AbstractController
     #[Route('', name: 'tournament_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
-        $tournament = $serializer->deserialize($request->getContent(), Tournament::class, 'json');
+        $data = json_decode($request->getContent(), true);
+
+        $organizer = $em->getRepository(User::class)->find($data['organizer_id'] ?? null);
+        if (!$organizer) {
+            return new JsonResponse(['error' => 'Organizer not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $tournament = new Tournament();
+        $tournament->setTournamentName($data['tournamentName'] ?? '');
+        $tournament->setStartDate(new \DateTime($data['startDate']));
+        $tournament->setEndDate(new \DateTime($data['endDate']));
+        $tournament->setLocation($data['location'] ?? null);
+        $tournament->setDescription($data['description'] ?? '');
+        $tournament->setMaxParticipants($data['maxParticipants'] ?? 0);
+        $tournament->setSport($data['sport'] ?? '');
+        $tournament->setOrganizer($organizer);
+
         $em->persist($tournament);
         $em->flush();
+
         $json = $serializer->serialize($tournament, 'json', ['groups' => 'tournament:read']);
         return new JsonResponse($json, Response::HTTP_CREATED, [], true);
     }
@@ -43,9 +61,12 @@ class TournamentController extends AbstractController
     #[Route('/{id}', name: 'tournament_update', methods: ['PUT'])]
     public function update(Request $request, Tournament $tournament, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
-        $data = $serializer->deserialize($request->getContent(), Tournament::class, 'json', ['object_to_populate' => $tournament]);
+        $serializer->deserialize($request->getContent(), Tournament::class, 'json', [
+            'object_to_populate' => $tournament,
+        ]);
+
         $em->flush();
-        $json = $serializer->serialize($data, 'json', ['groups' => 'tournament:read']);
+        $json = $serializer->serialize($tournament, 'json', ['groups' => 'tournament:read']);
         return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 

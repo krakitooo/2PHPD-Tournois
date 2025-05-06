@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TournamentRepository::class)]
 class Tournament
@@ -14,34 +15,44 @@ class Tournament
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tournament:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['tournament:read'])]
     private ?string $tournamentName = null;
 
     #[ORM\Column]
+    #[Groups(['tournament:read'])]
     private ?\DateTime $startDate = null;
 
     #[ORM\Column]
+    #[Groups(['tournament:read'])]
     private ?\DateTime $endDate = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['tournament:read'])]
     private ?string $location = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['tournament:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['tournament:read'])]
     private ?int $maxParticipants = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['tournament:read'])]
     private ?string $sport = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['tournament:read'])]
     private ?User $organizer = null;
 
     #[ORM\ManyToOne]
+    #[Groups(['tournament:read'])]
     private ?User $winner = null;
 
     /**
@@ -75,7 +86,6 @@ class Tournament
     public function setTournamentName(string $tournamentName): static
     {
         $this->tournamentName = $tournamentName;
-
         return $this;
     }
 
@@ -87,7 +97,6 @@ class Tournament
     public function setStartDate(\DateTime $startDate): static
     {
         $this->startDate = $startDate;
-
         return $this;
     }
 
@@ -99,7 +108,6 @@ class Tournament
     public function setEndDate(\DateTime $endDate): static
     {
         $this->endDate = $endDate;
-
         return $this;
     }
 
@@ -111,7 +119,6 @@ class Tournament
     public function setLocation(?string $location): static
     {
         $this->location = $location;
-
         return $this;
     }
 
@@ -123,7 +130,6 @@ class Tournament
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -135,7 +141,6 @@ class Tournament
     public function setMaxParticipants(int $maxParticipants): static
     {
         $this->maxParticipants = $maxParticipants;
-
         return $this;
     }
 
@@ -147,7 +152,6 @@ class Tournament
     public function setSport(string $sport): static
     {
         $this->sport = $sport;
-
         return $this;
     }
 
@@ -159,7 +163,6 @@ class Tournament
     public function setOrganizer(?User $organizer): static
     {
         $this->organizer = $organizer;
-
         return $this;
     }
 
@@ -171,7 +174,6 @@ class Tournament
     public function setWinner(?User $winner): static
     {
         $this->winner = $winner;
-
         return $this;
     }
 
@@ -196,7 +198,6 @@ class Tournament
     public function removeGame(SportMatch $game): static
     {
         if ($this->games->removeElement($game)) {
-            // set the owning side to null (unless already changed)
             if ($game->getTournament() === $this) {
                 $game->setTournament(null);
             }
@@ -226,7 +227,6 @@ class Tournament
     public function removeRegistration(Registration $registration): static
     {
         if ($this->registrations->removeElement($registration)) {
-            // set the owning side to null (unless already changed)
             if ($registration->getTournament() === $this) {
                 $registration->setTournament(null);
             }
