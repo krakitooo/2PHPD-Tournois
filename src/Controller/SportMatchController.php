@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\SportMatch;
+use App\Entity\Tournament;
+use App\Entity\User;
+use App\Repository\SportMatchRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+#[Route('/api/tournaments')]
+class SportMatchController extends AbstractController
+{
+    #[Route('/{id}/sport-matchs', name: 'match_index', methods: ['GET'])]
+    public function index(Tournament $id, SportMatchRepository $repo, SerializerInterface $serializer): JsonResponse
+    {
+        $matches = $repo->findBy(['tournament' => $id]);
+        $json = $serializer->serialize($matches, 'json', ['groups' => 'match:read']);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/{id}/sport-matchs', name: 'match_create', methods: ['POST'])]
+    public function create(Tournament $id, Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $player1 = $em->getRepository(User::class)->find($data['player1_id'] ?? null);
+        $player2 = $em->getRepository(User::class)->find($data['player2_id'] ?? null);
+
+        if (!$player1 || !$player2) {
+            return new JsonResponse(['error' => 'Player not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $match = new SportMatch();
+        $match->setTournament($id);
+        $match->setPlayer1($player1);
+        $match->setPlayer2($player2);
+        $match->setMatchDate(new \DateTime());
+        $match->setScorePlayer1(0);
+        $match->setScorePlayer2(0);
+        $match->setStatus('en attente');
+
+        $em->persist($match);
+        $em->flush();
+
+        $json = $serializer->serialize($match, 'json', ['groups' => 'match:read']);
+        return new JsonResponse($json, Response::HTTP_CREATED, [], true);
+    }
+
+    #[Route('/{idTournament}/sport-matchs/{idSportMatchs}', name: 'match_show', methods: ['GET'])]
+    public function show(SportMatch $idSportMatchs, SerializerInterface $serializer): JsonResponse
+    {
+        $json = $serializer->serialize($idSportMatchs, 'json', ['groups' => 'match:read']);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/{idTournament}/sport-matchs/{idSportMatchs}', name: 'match_update', methods: ['PUT'])]
+    public function update(Request $request, SportMatch $idSportMatchs, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (isset($data['scorePlayer1'])) {
+            $idSportMatchs->setScorePlayer1($data['scorePlayer1']);
+        }
+
+        if (isset($data['scorePlayer2'])) {
+            $idSportMatchs->setScorePlayer2($data['scorePlayer2']);
+        }
+
+        if ($idSportMatchs->getScorePlayer1() !== null && $idSportMatchs->getScorePlayer2() !== null) {
+            $idSportMatchs->setStatus('terminé');
+        }
+
+        $em->flush();
+        $json = $serializer->serialize($idSportMatchs, 'json', ['groups' => 'match:read']);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('/{idTournament}/sport-matchs/{idSportMatchs}', name: 'match_delete', methods: ['DELETE'])]
+    public function delete(SportMatch $idSportMatchs, EntityManagerInterface $em): JsonResponse
+    {
+        $em->remove($idSportMatchs);
+        $em->flush();
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+}
