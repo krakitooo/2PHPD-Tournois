@@ -34,45 +34,78 @@ class RegistrationController extends AbstractController
 
     #[Route('/{id}/registrations', name: 'registration_create', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function create(Tournament $tournament, Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    public function create(Tournament $id, Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
-        $userId = $data['player_id'] ?? null;
-
-        if (!$userId) {
-            return new JsonResponse(['error' => 'player_id is required'], Response::HTTP_BAD_REQUEST);
+        $currentUser = $this->getUser();
+    
+        // Vérifier si déjà inscrit
+        $existingRegistration = $em->getRepository(Registration::class)->findOneBy([
+            'player' => $currentUser,
+            'tournament' => $id
+        ]);
+    
+        if ($existingRegistration) {
+            return $this->json(['message' => 'You are already registered to this tournament.'], Response::HTTP_BAD_REQUEST);
         }
-
-        $player = $em->getRepository(User::class)->find($userId);
-        if (!$player) {
-            return new JsonResponse(['error' => 'Player not found'], Response::HTTP_NOT_FOUND);
-        }
-
+    
         $registration = new Registration();
-        $registration->setPlayer($player);
-        $registration->setTournament($tournament);
+        $registration->setPlayer($currentUser);
+        $registration->setTournament($id);
         $registration->setRegistrationDate(new \DateTime());
         $registration->setStatus('en attente');
-
+    
         $em->persist($registration);
         $em->flush();
-
+    
         $json = $serializer->serialize($registration, 'json', ['groups' => 'registration:read']);
         return new JsonResponse($json, Response::HTTP_CREATED, [], true);
     }
+    
 
     #[Route('/{idTournament}/registrations/{idRegistration}', name: 'registration_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
-    public function delete(Registration $idRegistration, EntityManagerInterface $em): JsonResponse
+    public function delete(Tournament $idTournament, Registration $idRegistration, EntityManagerInterface $em): JsonResponse
     {
         $currentUser = $this->getUser();
-        $tournament = $idRegistration->getTournament();
-        if ($tournament->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+    
+        // Vérifier que l'inscription correspond bien au tournoi donné
+        if ($idRegistration->getTournament()->getId() !== $idTournament->getId()) {
+            return $this->json(['message' => 'Registration does not belong to this tournament.'], Response::HTTP_BAD_REQUEST);
+        }
+    
+        // Autorisé si orga du tournoi, admin ou joueur inscrit
+        if ($idRegistration->getPlayer() !== $currentUser &&
+            $idTournament->getOrganizer() !== $currentUser &&
+            !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
+        }
+    
+        $em->remove($idRegistration);
+        $em->flush();
+    
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+    
+    #[Route('/{idTournament}/registrations/{idRegistration}/confirm', name: 'registration_confirm', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
+    public function confirm(Tournament $idTournament, Registration $idRegistration, EntityManagerInterface $em): JsonResponse
+    {
+        $currentUser = $this->getUser();
+
+        // Vérifier que l'inscription correspond bien au tournoi
+        if ($idRegistration->getTournament()->getId() !== $idTournament->getId()) {
+            return $this->json(['message' => 'Registration does not belong to this tournament.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Vérifier que seul l'organisateur ou un admin peut confirmer
+        if ($idTournament->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
             return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
         }
 
-        $em->remove($idRegistration);
+        // Mettre à jour le statut
+        $idRegistration->setStatus('confirmée');
         $em->flush();
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+
+        return $this->json(['message' => 'Registration confirmed.']);
     }
 }

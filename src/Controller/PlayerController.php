@@ -22,6 +22,8 @@ class PlayerController extends AbstractController
         $user = $serializer->deserialize($request->getContent(), User::class, 'json');
         $hashedPassword = $passwordHasher->hashPassword($user, $user->getPassword());
         $user->setPassword($hashedPassword);
+        $user->setStatus('actif');
+        $user->setRoles(['ROLE_USER']);
         $em->persist($user);
         $em->flush();
 
@@ -30,6 +32,7 @@ class PlayerController extends AbstractController
     }
 
     #[Route('/api/players', name: 'player_index', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(UserRepository $repository, SerializerInterface $serializer): JsonResponse
     {
         $users = $repository->findAll();
@@ -38,15 +41,27 @@ class PlayerController extends AbstractController
     }
 
     #[Route('/api/players/{id}', name: 'player_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(User $user, SerializerInterface $serializer): JsonResponse
     {
+        $currentUser = $this->getUser();
+        if ($currentUser !== $user && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
+        }
+
         $json = $serializer->serialize($user, 'json', ['groups' => 'user:read']);
         return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
 
     #[Route('/api/players/{id}', name: 'player_update', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
     public function update(Request $request, User $user, EntityManagerInterface $em, SerializerInterface $serializer, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
+        $currentUser = $this->getUser();
+        if ($currentUser !== $user && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
+        }
+
         $serializer->deserialize($request->getContent(), User::class, 'json', ['object_to_populate' => $user]);
         
         $newPassword = $user->getPassword();
@@ -61,6 +76,7 @@ class PlayerController extends AbstractController
     }
 
     #[Route('/api/players/{id}', name: 'player_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function delete(User $user, EntityManagerInterface $em): JsonResponse
     {
         $em->remove($user);
