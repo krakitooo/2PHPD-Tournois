@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Administration{% endblock %}
+
+{% block body %}
+<h1>Administration Dashboard</h1>
+
+<h2>Tournois</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Sport</th>
+            <th>Organisateur</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tournament in tournaments %}
+            <tr>
+                <td>{{ tournament.id }}</td>
+                <td>{{ tournament.tournamentName }}</td>
+                <td>{{ tournament.sport }}</td>
+                <td>{{ tournament.organizer.username }}</td>
+                <td>
+                    <a href="{{ path('tournament_show', { id: tournament.id }) }}">Voir</a>
+                    <a href="{{ path('tournament_update', { id: tournament.id }) }}">Modifier</a>
+                    <a href="{{ path('tournament_delete', { id: tournament.id }) }}" onclick="return confirm('Êtes-vous sûr ?')">Supprimer</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Participants</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Rôles</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.roles | join(', ') }}</td>
+                <td>
+                    <a href="{{ path('player_promote', { id: user.id }) }}">Promouvoir</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Inscriptions</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tournoi</th>
+            <th>Joueur</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for registration in registrations %}
+            <tr>
+                <td>{{ registration.id }}</td>
+                <td>{{ registration.tournament.tournamentName }}</td>
+                <td>{{ registration.player.username }}</td>
+                <td>{{ registration.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Parties</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tournoi</th>
+            <th>Joueur 1</th>
+            <th>Joueur 2</th>
+            <th>Score</th>
+            <th>Statut</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for match in matches %}
+            <tr>
+                <td>{{ match.id }}</td>
+                <td>{{ match.tournament.tournamentName }}</td>
+                <td>{{ match.player1.username }}</td>
+                <td>{{ match.player2.username }}</td>
+                <td>{{ match.scorePlayer1 }} - {{ match.scorePlayer2 }}</td>
+                <td>{{ match.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
