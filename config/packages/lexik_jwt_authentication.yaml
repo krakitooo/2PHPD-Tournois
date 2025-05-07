@@ -2,15 +2,4 @@ lexik_jwt_authentication:
     secret_key: '%env(resolve:JWT_SECRET_KEY)%'
     public_key: '%env(resolve:JWT_PUBLIC_KEY)%'
     pass_phrase: '%env(JWT_PASSPHRASE)%'
-    encoder:
-        service: lexik_jwt_authentication.encoder.web_token # We use the Web-Token encoder
-    access_token_issuance:
-        enabled: true
-        signature:
-            algorithm: 'RS256'
-            key: 'env(file:SIGNATURE_KEY)'
-    access_token_verification:
-        enabled: true
-        signature:
-            allowed_algorithms: ['RS256']
-            keyset: 'env(file:SIGNATURE_KEYSET)'
+    token_ttl: 3600

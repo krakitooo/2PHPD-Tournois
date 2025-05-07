@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class PlayerController extends AbstractController
 {
@@ -65,5 +66,26 @@ class PlayerController extends AbstractController
         $em->remove($user);
         $em->flush();
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/api/players/{id}/promote', name: 'player_promote', methods: ['PUT'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function promoteToAdmin(int $id, UserRepository $userRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $userRepository->find($id);
+
+        if (!$user) {
+            return $this->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        $roles = $user->getRoles();
+
+        if (!in_array('ROLE_ADMIN', $roles)) {
+            $roles[] = 'ROLE_ADMIN';
+            $user->setRoles($roles);
+            $em->flush();
+        }
+
+        return $this->json(['message' => 'User promoted to admin.']);
     }
 }
