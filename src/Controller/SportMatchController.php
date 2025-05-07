@@ -13,11 +13,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/tournaments')]
 class SportMatchController extends AbstractController
 {
     #[Route('/{id}/sport-matchs', name: 'match_index', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function index(Tournament $id, SportMatchRepository $repo, SerializerInterface $serializer): JsonResponse
     {
         $matches = $repo->findBy(['tournament' => $id]);
@@ -26,8 +28,14 @@ class SportMatchController extends AbstractController
     }
 
     #[Route('/{id}/sport-matchs', name: 'match_create', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function create(Tournament $id, Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
+        $currentUser = $this->getUser();
+        if ($id->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $player1 = $em->getRepository(User::class)->find($data['player1_id'] ?? null);
@@ -54,6 +62,7 @@ class SportMatchController extends AbstractController
     }
 
     #[Route('/{idTournament}/sport-matchs/{idSportMatchs}', name: 'match_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(SportMatch $idSportMatchs, SerializerInterface $serializer): JsonResponse
     {
         $json = $serializer->serialize($idSportMatchs, 'json', ['groups' => 'match:read']);
@@ -61,6 +70,7 @@ class SportMatchController extends AbstractController
     }
 
     #[Route('/{idTournament}/sport-matchs/{idSportMatchs}', name: 'match_update', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
     public function update(Request $request, SportMatch $idSportMatchs, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
