@@ -11,3 +11,13 @@ lexik_jwt_authentication:
             httpOnly: true
             samesite: strict   # ✅ valeur en minuscule
             secure: auto
+    
+    token_extractors:
+        cookie:
+            enabled: true
+            name: BEARER          # même nom que le cookie
+        authorization_header:     # on peut garder l’en-tête aussi
+            enabled: true
+            prefix: Bearer
+        query_parameter:
+            enabled: false

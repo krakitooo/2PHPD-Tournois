@@ -31,6 +31,11 @@ security:
             stateless: true
             jwt: ~
 
+        front:
+            pattern: ^/
+            stateless: true          # on reste sans session PHP
+            jwt: ~                   # même authenticator que l’API
+
         # Pour les pages « classiques » (twig…) si besoin
         main:
             lazy: true
