@@ -150,8 +150,19 @@ php bin/phpunit
 
 ## 👤 Authentification
 
-Authentification basée sur **sessions** côté dashboard et **JWT tokens** côté API.
+Authentification basée sur **sessions** côté dashboard et **JWT tokens** côté API.  
 Clé publique/privée générée dans `/config/jwt`.
+
+Dans les fixtures, on a généré des utilisateurs X allant de 1 à 5, pour chacun, voici les identifiants, en remplaçant X par le chiffre en question :
+```
+Identifiant : playerX
+Mot de passe : passX
+```
+Et pour l'admin :
+```
+Identifiant : admin
+Mot de passe : adminpass
+```
 
 
 ## 🛠️ Technologies principales
