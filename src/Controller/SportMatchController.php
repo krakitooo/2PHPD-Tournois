@@ -6,6 +6,7 @@ use App\Entity\SportMatch;
 use App\Entity\Tournament;
 use App\Entity\User;
 use App\Entity\Registration;
+use App\Event\NotificationEvent;
 use App\Repository\SportMatchRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[Route('/api/tournaments')]
 class SportMatchController extends AbstractController
@@ -92,9 +94,14 @@ class SportMatchController extends AbstractController
 
     #[Route('/{idTournament}/sport-matchs/{idSportMatchs}', name: 'match_update', methods: ['PUT'])]
     #[IsGranted('ROLE_USER')]
-    public function update(Request $request, SportMatch $idSportMatchs, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
+    public function update(Request $request, SportMatch $idSportMatchs, EntityManagerInterface $em, SerializerInterface $serializer, EventDispatcherInterface $dispatcher ): JsonResponse 
     {
         $currentUser = $this->getUser();
+
+        if (!$currentUser instanceof \App\Entity\User) {
+            throw new \LogicException('Current user is not an instance of App\Entity\User.');
+        }
+
         $tournament = $idSportMatchs->getTournament();
     
         if (!in_array('ROLE_ADMIN', $currentUser->getRoles()) &&
@@ -114,6 +121,32 @@ class SportMatchController extends AbstractController
             $idSportMatchs->setScorePlayer2($data['scorePlayer2']);
         }
     
+        if (!in_array('ROLE_ADMIN', $currentUser->getRoles()) && $tournament->getOrganizer()->getId() !== $currentUser->getId()) {
+            if ($currentUser->getId() === $idSportMatchs->getPlayer1()->getId() && $idSportMatchs->getScorePlayer2() === null) {
+                $dispatcher->dispatch(new NotificationEvent(
+                    $idSportMatchs->getPlayer2(),
+                    sprintf(
+                        "Ton adversaire %s %s a saisi son score pour le match du tournoi '%s'. À toi de remplir le tien !",
+                        $currentUser->getFirstName(),
+                        $currentUser->getLastName(),
+                        $tournament->getTournamentName()
+                    )
+                ));
+            }
+        
+            if ($currentUser->getId() === $idSportMatchs->getPlayer2()->getId() && $idSportMatchs->getScorePlayer1() === null) {
+                $dispatcher->dispatch(new NotificationEvent(
+                    $idSportMatchs->getPlayer1(),
+                    sprintf(
+                        "Ton adversaire %s %s a saisi son score pour le match du tournoi '%s'. À toi de remplir le tien !",
+                        $currentUser->getFirstName(),
+                        $currentUser->getLastName(),
+                        $tournament->getTournamentName()
+                    )
+                ));
+            }
+        }        
+
         if ($idSportMatchs->getScorePlayer1() !== null && $idSportMatchs->getScorePlayer2() !== null) {
             $idSportMatchs->setStatus('terminé');
         }

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Tournament;
 use App\Entity\User;
+use App\Entity\Registration;
+use App\Event\NotificationEvent;
 use App\Repository\TournamentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,6 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[Route('/api/tournaments')]
 class TournamentController extends AbstractController
@@ -123,6 +126,56 @@ class TournamentController extends AbstractController
         $json = $serializer->serialize($tournament, 'json', ['groups' => 'tournament:read']);
         return new JsonResponse($json, Response::HTTP_OK, [], true);
     }
+
+    #[Route('/{id}/set-winner', name: 'tournament_set_winner', methods: ['PUT'])]
+    #[IsGranted('ROLE_USER')]
+    public function setWinner(Tournament $id, Request $request, EntityManagerInterface $em, EventDispatcherInterface $dispatcher, SerializerInterface $serializer): JsonResponse 
+    {
+        $currentUser = $this->getUser();
+
+        // Autorisation
+        if ($id->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+            return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $winner = $em->getRepository(User::class)->find($data['winner_id'] ?? null);
+
+        if (!$winner) {
+            return $this->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Vérifier qu'il est bien inscrit ET confirmé au tournoi
+        $registration = $em->getRepository(Registration::class)->findOneBy([
+            'tournament' => $id,
+            'player' => $winner,
+            'status' => 'confirmée',
+        ]);
+
+        if (!$registration) {
+            return $this->json(['message' => 'Winner must be a confirmed participant of the tournament.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $id->setWinner($winner);
+        $em->flush();
+
+        // Notifications
+        $participants = $em->getRepository(Registration::class)->findBy([
+            'tournament' => $id,
+            'status' => 'confirmée',
+        ]);
+
+        foreach ($participants as $participant) {
+            $dispatcher->dispatch(new NotificationEvent(
+                $participant->getPlayer(),
+                "Le tournoi \"{$id->getTournamentName()}\" a été remporté par {$winner->getUsername()}."
+            ));
+        }
+
+        $json = $serializer->serialize($id, 'json', ['groups' => 'tournament:read']);
+        return new JsonResponse($json, Response::HTTP_OK, [], true);
+    }
+
 
     #[Route('/{id}', name: 'tournament_delete', methods: ['DELETE'])]
     #[IsGranted('ROLE_USER')]
