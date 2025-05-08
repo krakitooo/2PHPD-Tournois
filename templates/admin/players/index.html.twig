@@ -5,13 +5,6 @@
 {% block body %}
     <h1>Gestion des joueurs</h1>
 
-    <nav>
-        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ path('admin_players_index') }}">Joueurs</a> 
-        <a href="{{ path('admin_tournaments_index') }}">Tournois</a> 
-        <a href="{{ path('admin_registrations_index') }}">Inscriptions</a> 
-        <a href="{{ path('admin_sportmatches_index') }}">Matchs</a>
-    </nav>
     <br/>
     <table border="1">
         <thead>
@@ -36,7 +29,7 @@
                     <td>{{ player.emailAddress }}</td>
                     <td>{{ player.roles|join(', ') }}</td>
                     <td>{{ player.status }}</td>
-                    <td>
+                    <td class="actions">
                         <a href="{{ path('admin_players_edit', {id: player.id}) }}">Modifier</a> |
                         <a href="{{ path('admin_players_delete', {id: player.id}) }}">Supprimer</a>
                     </td>
@@ -47,5 +40,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('admin_players_new') }}">Ajouter un joueur</a>
+    <a href="{{ path('admin_players_new') }}" class="add-button">Ajouter un joueur</a>
 {% endblock %}

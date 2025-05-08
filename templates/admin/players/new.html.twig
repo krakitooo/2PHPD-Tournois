@@ -11,10 +11,15 @@
         {{ form_row(form.lastName) }}
         {{ form_row(form.emailAddress) }}
         {{ form_row(form.plainPassword) }}
-        {{ form_row(form.roles) }}
+        <div class="checkbox">
+            {{ form_label(form.roles) }}
+            <div>
+                {{ form_widget(form.roles) }}
+            </div>
+        </div>
 
         <button type="submit">Créer</button>
     {{ form_end(form) }}
 
-    <a href="{{ path('admin_players_index') }}">Retour à la liste</a>
+    <a href="{{ path('admin_players_index') }}" class="back-link">Retour à la liste</a>
 {% endblock %}

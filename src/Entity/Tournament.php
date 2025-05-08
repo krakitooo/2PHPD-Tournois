@@ -58,7 +58,7 @@ class Tournament
     #[ORM\OneToMany(targetEntity: SportMatch::class, mappedBy: 'tournament', orphanRemoval: true)]
     private Collection $games;
 
-    #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'tournament')]
+    #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'tournament', orphanRemoval: true, cascade: ['remove'])]
     private Collection $registrations;
 
     public function __construct()

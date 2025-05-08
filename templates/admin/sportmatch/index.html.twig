@@ -5,13 +5,6 @@
 {% block body %}
     <h1>Gestion des matchs</h1>
     
-    <nav>
-        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ path('admin_players_index') }}">Joueurs</a> 
-        <a href="{{ path('admin_tournaments_index') }}">Tournois</a> 
-        <a href="{{ path('admin_registrations_index') }}">Inscriptions</a> 
-        <a href="{{ path('admin_sportmatches_index') }}">Matchs</a>
-    </nav>
     <br/>
 
     <table>
@@ -33,13 +26,25 @@
                 <tr>
                     <td>{{ match.id }}</td>
                     <td>{{ match.tournament.tournamentName }}</td>
-                    <td>{{ match.player1.username }}</td>
-                    <td>{{ match.player2.username }}</td>
+                    <td>
+                        {% if match.player1 is not null %}
+                            {{ match.player1.username }}
+                        {% else %}
+                            Joueur supprimé
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if match.player2 is not null %}
+                            {{ match.player2.username }}
+                        {% else %}
+                            Joueur supprimé
+                        {% endif %}
+                    </td>
                     <td>{{ match.scorePlayer1 }}</td>
                     <td>{{ match.scorePlayer2 }}</td>
                     <td>{{ match.matchDate ? match.matchDate|date('Y-m-d H:i') : '' }}</td>
                     <td>{{ match.status }}</td>
-                    <td>
+                    <td class="actions">
                         <a href="{{ path('admin_sportmatches_edit', {id: match.id}) }}">Modifier</a> |
                         <a href="{{ path('admin_sportmatches_delete', {id: match.id}) }}">Supprimer</a>
                     </td>
@@ -50,5 +55,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('admin_sportmatches_new') }}">Ajouter un match</a>
+    <a href="{{ path('admin_sportmatches_new') }}" class="add-button">Ajouter un match</a>
 {% endblock %}

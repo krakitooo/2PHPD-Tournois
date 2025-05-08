@@ -5,20 +5,45 @@
 {% block body %}
     <h1>Dashboard Administrateur</h1>
 
-    <nav>
-        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ path('admin_players_index') }}">Joueurs</a> 
-        <a href="{{ path('admin_tournaments_index') }}">Tournois</a> 
-        <a href="{{ path('admin_registrations_index') }}">Inscriptions</a> 
-        <a href="{{ path('admin_sportmatches_index') }}">Matchs</a>
-    </nav>
-    <br/>
-
-    <ul>
-        <li>Total des joueurs : {{ totalUsers }}</li>
-        <li>Total des tournois : {{ totalTournaments }}</li>
-        <li>Total des inscriptions : {{ totalRegistrations }}</li>
-        <li>Total des matchs : {{ totalMatches }}</li>
-    </ul>
-
+    <div class="stats-grid">
+        <a href="{{ path('admin_players_index') }}" class="card-link">
+            <div class="stat-card players">
+                <div class="card-icon">👤</div>
+                <div class="card-content">
+                    <div class="card-value">{{ totalUsers }}</div>
+                    <div class="card-label">Joueurs</div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="{{ path('admin_tournaments_index') }}" class="card-link">
+            <div class="stat-card tournaments">
+                <div class="card-icon">🏆</div>
+                <div class="card-content">
+                    <div class="card-value">{{ totalTournaments }}</div>
+                    <div class="card-label">Tournois</div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="{{ path('admin_registrations_index') }}" class="card-link">
+            <div class="stat-card registrations">
+                <div class="card-icon">📝</div>
+                <div class="card-content">
+                    <div class="card-value">{{ totalRegistrations }}</div>
+                    <div class="card-label">Inscriptions</div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="{{ path('admin_sportmatches_index') }}" class="card-link">
+            <div class="stat-card matches">
+                <div class="card-icon">🎮</div>
+                <div class="card-content">
+                    <div class="card-value">{{ totalMatches }}</div>
+                    <div class="card-label">Matchs</div>
+                </div>
+            </div>
+        </a>
+    </div>
 {% endblock %}

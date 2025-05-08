@@ -4,14 +4,6 @@
 
 {% block body %}
     <h1>Gestion des tournois</h1>
-
-    <nav>
-        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
-        <a href="{{ path('admin_players_index') }}">Joueurs</a> 
-        <a href="{{ path('admin_tournaments_index') }}">Tournois</a> 
-        <a href="{{ path('admin_registrations_index') }}">Inscriptions</a> 
-        <a href="{{ path('admin_sportmatches_index') }}">Matchs</a>
-    </nav>
     <br/>
     <table>
         <thead>
@@ -53,7 +45,7 @@
                             en cours
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="actions">
                         <a href="{{ path('admin_tournaments_edit', {id: tournament.id}) }}">Modifier</a> |
                         <a href="{{ path('admin_tournaments_delete', {id: tournament.id}) }}">Supprimer</a>
                     </td>
@@ -64,5 +56,5 @@
         </tbody>
     </table>
 
-    <a href="{{ path('admin_tournaments_new') }}">Ajouter un tournoi</a>
+    <a href="{{ path('admin_tournaments_new') }}" class="add-button">Ajouter un tournoi</a>
 {% endblock %}
