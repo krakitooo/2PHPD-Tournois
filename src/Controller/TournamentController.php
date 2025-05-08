@@ -130,12 +130,16 @@ class TournamentController extends AbstractController
     public function delete(Tournament $tournament, EntityManagerInterface $em): JsonResponse
     {
         $currentUser = $this->getUser();
+    
+        // Vérifiez si l'utilisateur est l'organisateur ou un administrateur
         if ($tournament->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
             return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
         }
-        
+    
+        // Supprimez le tournoi
         $em->remove($tournament);
         $em->flush();
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    
+        return $this->json(['message' => 'Tournoi supprimé avec succès.'], Response::HTTP_OK);
     }
 }
