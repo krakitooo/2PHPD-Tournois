@@ -19,11 +19,11 @@ class SportMatch
     #[Groups(['match:read'])]
     private ?\DateTime $matchDate = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['match:read'])]
     private ?int $scorePlayer1 = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['match:read'])]
     private ?int $scorePlayer2 = null;
 
@@ -46,12 +46,6 @@ class SportMatch
     #[Groups(['match:read'])]
     private ?User $player2 = null;
 
-    public function __construct()
-    {
-        $this->scorePlayer1 = 0;
-        $this->scorePlayer2 = 0;
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -73,7 +67,7 @@ class SportMatch
         return $this->scorePlayer1;
     }
 
-    public function setScorePlayer1(int $scorePlayer1): static
+    public function setScorePlayer1(?int $scorePlayer1): static
     {
         $this->scorePlayer1 = $scorePlayer1;
         return $this;
@@ -84,7 +78,7 @@ class SportMatch
         return $this->scorePlayer2;
     }
 
-    public function setScorePlayer2(int $scorePlayer2): static
+    public function setScorePlayer2(?int $scorePlayer2): static
     {
         $this->scorePlayer2 = $scorePlayer2;
         return $this;

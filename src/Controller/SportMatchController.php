@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\SportMatch;
 use App\Entity\Tournament;
 use App\Entity\User;
+use App\Entity\Registration;
 use App\Repository\SportMatchRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +47,7 @@ class SportMatchController extends AbstractController
         }
     
         // Vérifier que les deux joueurs sont inscrits et confirmés au tournoi
-        $registrationRepo = $em->getRepository(\App\Entity\Registration::class);
+        $registrationRepo = $em->getRepository(Registration::class);
         $reg1 = $registrationRepo->findOneBy(['player' => $player1, 'tournament' => $id, 'status' => 'confirmée']);
         $reg2 = $registrationRepo->findOneBy(['player' => $player2, 'tournament' => $id, 'status' => 'confirmée']);
     
@@ -54,13 +55,22 @@ class SportMatchController extends AbstractController
             return $this->json(['message' => 'Both players must be confirmed participants of the tournament.'], Response::HTTP_BAD_REQUEST);
         }
     
-        $match = new \App\Entity\SportMatch();
+        $match = new SportMatch();
         $match->setTournament($id);
         $match->setPlayer1($player1);
         $match->setPlayer2($player2);
-        $match->setMatchDate(new \DateTime());
-        $match->setScorePlayer1(0);
-        $match->setScorePlayer2(0);
+        if (!empty($data['matchDate'])) {
+            try {
+                $date = new \DateTime($data['matchDate']);
+                $match->setMatchDate($date);
+            } catch (\Exception $e) {
+                return new JsonResponse(['error' => 'Invalid date format'], Response::HTTP_BAD_REQUEST);
+            }
+        } else {
+            $match->setMatchDate(new \DateTime());
+        }
+        $match->setScorePlayer1(null);
+        $match->setScorePlayer2(null);
         $match->setStatus('en attente');
     
         $em->persist($match);
@@ -104,9 +114,8 @@ class SportMatchController extends AbstractController
             $idSportMatchs->setScorePlayer2($data['scorePlayer2']);
         }
     
-        // Seul l'organisateur ou admin peut modifier le status
-        if (isset($data['status']) && (in_array('ROLE_ADMIN', $currentUser->getRoles()) || $tournament->getOrganizer() === $currentUser)) {
-            $idSportMatchs->setStatus($data['status']);
+        if ($idSportMatchs->getScorePlayer1() !== null && $idSportMatchs->getScorePlayer2() !== null) {
+            $idSportMatchs->setStatus('terminé');
         }
     
         $em->flush();
