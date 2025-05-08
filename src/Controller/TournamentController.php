@@ -17,6 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/tournaments')]
 class TournamentController extends AbstractController
 {
+
     #[Route('', name: 'tournament_index', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function index(TournamentRepository $repository): JsonResponse

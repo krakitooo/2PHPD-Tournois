@@ -12,10 +12,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Security\Core\Security;
 
-#[Route('/admin')]
+
+
 class AdminController extends AbstractController
 {
-    #[Route('/admin', name: 'admin_dashboard', methods: ['GET'])]
+    #[Route('/admin', name: 'admin_dashboard')]
     public function dashboard(
         TournamentRepository $tournamentRepo,
         UserRepository $userRepo,

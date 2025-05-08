@@ -1,20 +1,74 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello TournamentController!{% endblock %}
+{% block title %}Gestion des Tournois{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<h1>Gestion des Tournois</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/basti/Documents/GitHub/2PHPD-Tournois/src/Controller/TournamentController.php</code></li>
-        <li>Your template at <code>C:/Users/basti/Documents/GitHub/2PHPD-Tournois/templates/tournament/index.html.twig</code></li>
-    </ul>
+<div>
+    <h2>Rechercher un tournoi</h2>
+    <input type="text" id="search-bar" placeholder="Rechercher un tournoi par nom">
+    <button id="search-button">Rechercher</button>
 </div>
+
+<div>
+    <h2>Liste des tournois</h2>
+    <ul id="tournament-list"></ul>
+</div>
+
+<script>
+    const apiUrl = 'http://localhost:8000/api/tournaments';
+
+    // Fonction pour afficher une alerte
+    const showAlert = (msg, type = 'success') => {
+        document.getElementById('alertBox').innerHTML =
+            `<div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${msg}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>`;
+    };
+
+    // Charger tous les tournois
+    async function loadTournaments(query = '') {
+        const token = localStorage.getItem('jwt'); // Récupère le token JWT stocké
+        if (!token) {
+            showAlert('❌ Vous devez être connecté pour voir les tournois.', 'danger');
+            return;
+        }
+
+        const url = query ? `${apiUrl}/search?q=${query}` : apiUrl;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.status === 401) {
+            showAlert('❌ Authentification requise. Veuillez vous connecter.', 'danger');
+            return;
+        }
+
+        const tournaments = await response.json();
+        const list = document.getElementById('tournament-list');
+        list.innerHTML = '';
+        tournaments.forEach((tournament) => {
+            const li = document.createElement('li');
+            li.textContent = `${tournament.id}: ${tournament.tournamentName} (${tournament.status})`;
+            list.appendChild(li);
+        });
+    }
+
+    // Charger les tournois au chargement de la page
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTournaments();
+    });
+
+    // Rechercher un tournoi
+    document.getElementById('search-button').addEventListener('click', () => {
+        const query = document.getElementById('search-bar').value;
+        loadTournaments(query);
+    });
+</script>
 {% endblock %}
