@@ -1,0 +1,16 @@
+{% extends 'admin/header.html.twig' %}
+
+{% block title %}Ajouter une inscription{% endblock %}
+
+{% block body %}
+    <h1>Ajouter une inscription</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.tournament) }}
+        {{ form_row(form.player) }}
+        {{ form_row(form.status) }}
+        <button type="submit">Créer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('admin_registrations_index') }}">Retour à la liste</a>
+{% endblock %}

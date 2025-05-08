@@ -1,0 +1,39 @@
+{% extends 'admin/header.html.twig' %}
+
+{% block title %}Inscriptions{% endblock %}
+
+{% block body %}
+    <h1>Inscriptions</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tournoi</th>
+                <th>Joueur</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registration in registrations %}
+                <tr>
+                    <td>{{ registration.id }}</td>
+                    <td>{{ registration.tournament.tournamentName }}</td>
+                    <td>{{ registration.player.username }}</td>
+                    <td>{{ registration.registrationDate ? registration.registrationDate|date('Y-m-d H:i') : '' }}</td>
+                    <td>{{ registration.status }}</td>
+                    <td>
+                        <a href="{{ path('admin_registrations_edit', {id: registration.id}) }}">Modifier</a> |
+                        <a href="{{ path('admin_registrations_delete', {id: registration.id}) }}">Supprimer</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6">Aucune inscription trouvée.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_registrations_new') }}">Ajouter une inscription</a>
+{% endblock %}
