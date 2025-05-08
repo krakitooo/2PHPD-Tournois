@@ -93,7 +93,7 @@ symfony server:start
 
 ## 🏛️ Interface d’administration (Dashboard)
 
-Accessible via `/admin`, l’interface est **sécurisée par rôle `ROLE_ADMIN`**.
+Accessible via `localhost:8000/admin`, l’interface est **sécurisée par rôle `ROLE_ADMIN`**.
 
 Elle permet de :
 
