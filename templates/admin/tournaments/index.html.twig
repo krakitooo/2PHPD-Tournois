@@ -1,0 +1,60 @@
+{% extends 'admin/header.html.twig' %}
+
+{% block title %}Gestion des tournois{% endblock %}
+
+{% block body %}
+    <h1>Gestion des tournois</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Début</th>
+                <th>Fin</th>
+                <th>Lieu</th>
+                <th>Description</th>
+                <th>Sport</th>
+                <th>Participants max</th>
+                <th>Organisateur</th>
+                <th>Gagnant</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tournament in tournaments %}
+                <tr>
+                    <td>{{ tournament.id }}</td>
+                    <td>{{ tournament.tournamentName }}</td>
+                    <td>{{ tournament.startDate ? tournament.startDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ tournament.endDate ? tournament.endDate|date('Y-m-d') : '' }}</td>
+                    <td>{{ tournament.location }}</td>
+                    <td>{{ tournament.description }}</td>
+                    <td>{{ tournament.sport }}</td>
+                    <td>{{ tournament.maxParticipants }}</td>
+                    <td>{{ tournament.organizer.username }}</td>
+                    <td>{{ tournament.winner ? tournament.winner.username : 'Non défini' }}</td>
+                    <td>
+                        {% set now = "now"|date("U") %}
+                        {% if tournament.startDate and tournament.startDate.timestamp > now %}
+                            à venir
+                        {% elseif tournament.endDate and tournament.endDate.timestamp < now %}
+                            terminé
+                        {% else %}
+                            en cours
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('admin_tournaments_edit', {id: tournament.id}) }}">Modifier</a> |
+                        <a href="{{ path('admin_tournaments_delete', {id: tournament.id}) }}">Supprimer</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="12">Aucun tournoi trouvé.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_tournaments_new') }}">Ajouter un tournoi</a>
+{% endblock %}

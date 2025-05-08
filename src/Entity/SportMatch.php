@@ -46,6 +46,12 @@ class SportMatch
     #[Groups(['match:read'])]
     private ?User $player2 = null;
 
+    public function __construct()
+    {
+        $this->scorePlayer1 = 0;
+        $this->scorePlayer2 = 0;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

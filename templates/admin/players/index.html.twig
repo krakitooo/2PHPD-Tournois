@@ -1,0 +1,43 @@
+{% extends 'admin/header.html.twig' %}
+
+{% block title %}Gestion des joueurs{% endblock %}
+
+{% block body %}
+    <h1>Gestion des joueurs</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom d'utilisateur</th>
+                <th>Prénom</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôles</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for player in players %}
+                <tr>
+                    <td>{{ player.id }}</td>
+                    <td>{{ player.username }}</td>
+                    <td>{{ player.firstName }}</td>
+                    <td>{{ player.lastName }}</td>
+                    <td>{{ player.emailAddress }}</td>
+                    <td>{{ player.roles|join(', ') }}</td>
+                    <td>{{ player.status }}</td>
+                    <td>
+                        <a href="{{ path('admin_players_edit', {id: player.id}) }}">Modifier</a> |
+                        <a href="{{ path('admin_players_delete', {id: player.id}) }}">Supprimer</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="8">Aucun joueur trouvé.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_players_new') }}">Ajouter un joueur</a>
+{% endblock %}

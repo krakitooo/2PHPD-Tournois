@@ -1,0 +1,22 @@
+{% extends 'admin/header.html.twig' %}
+
+{% block title %}Modifier le tournoi{% endblock %}
+
+{% block body %}
+    <h1>Modifier le tournoi</h1>
+
+    {{ form_start(form) }}
+        {{ form_row(form.tournamentName) }}
+        {{ form_row(form.startDate) }}
+        {{ form_row(form.endDate) }}
+        {{ form_row(form.location) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.maxParticipants) }}
+        {{ form_row(form.sport) }}
+        {{ form_row(form.organizer) }}
+        {{ form_row(form.winner) }}
+        <button type="submit">Enregistrer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('admin_tournaments_index') }}">Retour à la liste</a>
+{% endblock %}

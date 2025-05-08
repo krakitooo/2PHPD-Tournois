@@ -1,0 +1,21 @@
+{% extends 'admin/header.html.twig' %}
+
+{% block title %}Dashboard Admin{% endblock %}
+
+{% block body %}
+    <h1>Dashboard Administrateur</h1>
+
+    <ul>
+        <li>Total des joueurs : {{ totalUsers }}</li>
+        <li>Total des tournois : {{ totalTournaments }}</li>
+        <li>Total des inscriptions : {{ totalRegistrations }}</li>
+        <li>Total des matchs : {{ totalMatches }}</li>
+    </ul>
+
+    <nav>
+        <a href="{{ path('admin_players_index') }}">Gérer les joueurs</a> |
+        <a href="{{ path('admin_tournaments_index') }}">Gérer les tournois</a> |
+        <a href="{{ path('admin_registrations_index') }}">Gérer les inscriptions</a> |
+        <a href="{{ path('admin_sport_matches_index') }}">Gérer les matchs</a>
+    </nav>
+{% endblock %}
