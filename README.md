@@ -119,7 +119,7 @@ Les notifications sont **stockées en BDD** et accessibles via `/api/notificatio
 Une commande est disponible :
 
 ```bash
-php bin/console app:players:stats {playerId} [tournamentId]
+php bin/console app:player:stats {playerId} [tournamentId]
 ```
 
 Elle affiche le **nombre de victoires/défaites** d’un joueur globalement ou dans un tournoi donné.
