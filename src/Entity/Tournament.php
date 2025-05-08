@@ -55,15 +55,9 @@ class Tournament
     #[Groups(['tournament:read'])]
     private ?User $winner = null;
 
-    /**
-     * @var Collection<int, SportMatch>
-     */
     #[ORM\OneToMany(targetEntity: SportMatch::class, mappedBy: 'tournament', orphanRemoval: true)]
     private Collection $games;
 
-    /**
-     * @var Collection<int, Registration>
-     */
     #[ORM\OneToMany(targetEntity: Registration::class, mappedBy: 'tournament')]
     private Collection $registrations;
 
@@ -177,9 +171,6 @@ class Tournament
         return $this;
     }
 
-    /**
-     * @return Collection<int, SportMatch>
-     */
     public function getGames(): Collection
     {
         return $this->games;
@@ -206,9 +197,6 @@ class Tournament
         return $this;
     }
 
-    /**
-     * @return Collection<int, Registration>
-     */
     public function getRegistrations(): Collection
     {
         return $this->registrations;

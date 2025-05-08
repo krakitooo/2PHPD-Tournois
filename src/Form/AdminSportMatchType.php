@@ -54,10 +54,8 @@ class AdminSportMatchType extends AbstractType
                 ],
             ]);
             
-        // Ajouter les champs player1 et player2 avec seulement les joueurs inscrits et confirmés
         $formModifier = function (FormInterface $form, Tournament $tournament = null) {
             if (null === $tournament) {
-                // Si aucun tournoi n'est sélectionné, afficher une liste vide
                 $form->add('player1', EntityType::class, [
                     'class' => User::class,
                     'choice_label' => 'username',
@@ -74,7 +72,6 @@ class AdminSportMatchType extends AbstractType
                     'disabled' => true,
                 ]);
             } else {
-                // Récupérer les joueurs inscrits et confirmés au tournoi
                 $confirmedPlayers = $this->entityManager->getRepository(Registration::class)
                     ->createQueryBuilder('r')
                     ->join('r.player', 'u')
@@ -105,7 +102,6 @@ class AdminSportMatchType extends AbstractType
             }
         };
         
-        // Ajouter un écouteur d'événement pour le champ tournament
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier) {

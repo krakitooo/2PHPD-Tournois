@@ -38,7 +38,6 @@ class RegistrationController extends AbstractController
     {
         $currentUser = $this->getUser();
     
-        // Vérifier si déjà inscrit
         $existingRegistration = $em->getRepository(Registration::class)->findOneBy([
             'player' => $currentUser,
             'tournament' => $id
@@ -68,12 +67,10 @@ class RegistrationController extends AbstractController
     {
         $currentUser = $this->getUser();
     
-        // Vérifier que l'inscription correspond bien au tournoi donné
         if ($idRegistration->getTournament()->getId() !== $idTournament->getId()) {
             return $this->json(['message' => 'Registration does not belong to this tournament.'], Response::HTTP_BAD_REQUEST);
         }
     
-        // Autorisé si orga du tournoi, admin ou joueur inscrit
         if ($idRegistration->getPlayer() !== $currentUser &&
             $idTournament->getOrganizer() !== $currentUser &&
             !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
@@ -92,17 +89,14 @@ class RegistrationController extends AbstractController
     {
         $currentUser = $this->getUser();
 
-        // Vérifier que l'inscription correspond bien au tournoi
         if ($idRegistration->getTournament()->getId() !== $idTournament->getId()) {
             return $this->json(['message' => 'Registration does not belong to this tournament.'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Vérifier que seul l'organisateur ou un admin peut confirmer
         if ($idTournament->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
             return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
         }
 
-        // Mettre à jour le statut
         $idRegistration->setStatus('confirmée');
         $em->flush();
 

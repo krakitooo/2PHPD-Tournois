@@ -48,7 +48,6 @@ class SportMatchController extends AbstractController
             return new JsonResponse(['error' => 'Player not found'], Response::HTTP_NOT_FOUND);
         }
     
-        // Vérifier que les deux joueurs sont inscrits et confirmés au tournoi
         $registrationRepo = $em->getRepository(Registration::class);
         $reg1 = $registrationRepo->findOneBy(['player' => $player1, 'tournament' => $id, 'status' => 'confirmée']);
         $reg2 = $registrationRepo->findOneBy(['player' => $player2, 'tournament' => $id, 'status' => 'confirmée']);

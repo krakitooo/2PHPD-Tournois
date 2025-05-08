@@ -64,7 +64,7 @@ class PlayerStatsCommand extends Command
 
         foreach ($matches as $match) {
             if ($match->getStatus() !== 'terminé') {
-                continue; // ignorer les matchs non terminés
+                continue;
             }
 
             $isPlayer1 = $match->getPlayer1()->getId() === $user->getId();

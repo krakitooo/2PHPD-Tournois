@@ -110,14 +110,6 @@ class AppFixtures extends Fixture
         $match3->setStatus('terminé');
         $manager->persist($match3);
 
-        // Notifications de base
-        foreach ($users as $user) {
-            $notif = new Notification();
-            $notif->setUser($user);
-            $notif->setMessage("Bienvenue sur la plateforme, {$user->getFirstName()} !");
-            $manager->persist($notif);
-        }
-
         $manager->flush();
     }
 }

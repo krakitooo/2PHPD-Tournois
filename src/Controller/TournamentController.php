@@ -67,7 +67,6 @@ class TournamentController extends AbstractController
             $status = 'terminé';
         }
     
-        // Crée manuellement le tableau de données à retourner
         $data = [
             'id' => $tournament->getId(),
             'tournamentName' => $tournament->getTournamentName(),
@@ -88,7 +87,7 @@ class TournamentController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function create(Request $request, EntityManagerInterface $em, SerializerInterface $serializer): JsonResponse
     {
-        $currentUser = $this->getUser();  // récupère l'utilisateur connecté
+        $currentUser = $this->getUser();
     
         $data = json_decode($request->getContent(), true);
     
@@ -133,7 +132,6 @@ class TournamentController extends AbstractController
     {
         $currentUser = $this->getUser();
 
-        // Autorisation
         if ($id->getOrganizer() !== $currentUser && !in_array('ROLE_ADMIN', $currentUser->getRoles())) {
             return $this->json(['message' => 'Access denied.'], Response::HTTP_FORBIDDEN);
         }
@@ -145,7 +143,6 @@ class TournamentController extends AbstractController
             return $this->json(['message' => 'User not found.'], Response::HTTP_NOT_FOUND);
         }
 
-        // Vérifier qu'il est bien inscrit ET confirmé au tournoi
         $registration = $em->getRepository(Registration::class)->findOneBy([
             'tournament' => $id,
             'player' => $winner,
@@ -159,7 +156,6 @@ class TournamentController extends AbstractController
         $id->setWinner($winner);
         $em->flush();
 
-        // Notifications
         $participants = $em->getRepository(Registration::class)->findBy([
             'tournament' => $id,
             'status' => 'confirmée',

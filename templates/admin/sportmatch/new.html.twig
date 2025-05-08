@@ -20,19 +20,15 @@
     
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // On récupère le champ tournament
     const tournamentField = document.querySelector('#admin_sport_match_tournament');
     
-    // On ajoute un écouteur d'événement pour actualiser les listes de joueurs
     tournamentField.addEventListener('change', function() {
         const tournamentId = this.value;
         if (!tournamentId) return;
         
-        // URL corrigée pour correspondre à la route du contrôleur
         fetch(`/admin/matches/tournaments/${tournamentId}/players`)
             .then(response => response.json())
             .then(data => {
-                // Mettre à jour les options des dropdowns player1 et player2
                 updatePlayerDropdown('admin_sport_match_player1', data);
                 updatePlayerDropdown('admin_sport_match_player2', data);
             })
@@ -41,17 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function updatePlayerDropdown(selectId, players) {
         const selectElement = document.getElementById(selectId);
-        // Vider le dropdown
         selectElement.innerHTML = '';
         
-        // Ajouter l'option placeholder
         const placeholderOption = document.createElement('option');
         placeholderOption.value = '';
         placeholderOption.textContent = 'Choisir un joueur';
         placeholderOption.selected = true;
         selectElement.appendChild(placeholderOption);
         
-        // Ajouter les options des joueurs
         players.forEach(player => {
             const option = document.createElement('option');
             option.value = player.id;
@@ -59,7 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
             selectElement.appendChild(option);
         });
         
-        // Activer le dropdown
         selectElement.disabled = false;
     }
 });
