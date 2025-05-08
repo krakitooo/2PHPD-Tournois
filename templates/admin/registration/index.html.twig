@@ -5,6 +5,15 @@
 {% block body %}
     <h1>Inscriptions</h1>
 
+    <nav>
+        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ path('admin_players_index') }}">Joueurs</a> 
+        <a href="{{ path('admin_tournaments_index') }}">Tournois</a> 
+        <a href="{{ path('admin_registrations_index') }}">Inscriptions</a> 
+        <a href="{{ path('admin_sportmatches_index') }}">Matchs</a>
+    </nav>
+    <br/>
+    
     <table>
         <thead>
             <tr>

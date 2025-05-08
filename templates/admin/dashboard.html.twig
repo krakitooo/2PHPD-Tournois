@@ -5,6 +5,15 @@
 {% block body %}
     <h1>Dashboard Administrateur</h1>
 
+    <nav>
+        <a href="{{ path('admin_dashboard') }}">Dashboard</a>
+        <a href="{{ path('admin_players_index') }}">Joueurs</a> 
+        <a href="{{ path('admin_tournaments_index') }}">Tournois</a> 
+        <a href="{{ path('admin_registrations_index') }}">Inscriptions</a> 
+        <a href="{{ path('admin_sportmatches_index') }}">Matchs</a>
+    </nav>
+    <br/>
+
     <ul>
         <li>Total des joueurs : {{ totalUsers }}</li>
         <li>Total des tournois : {{ totalTournaments }}</li>
@@ -12,10 +21,4 @@
         <li>Total des matchs : {{ totalMatches }}</li>
     </ul>
 
-    <nav>
-        <a href="{{ path('admin_players_index') }}">Gérer les joueurs</a> |
-        <a href="{{ path('admin_tournaments_index') }}">Gérer les tournois</a> |
-        <a href="{{ path('admin_registrations_index') }}">Gérer les inscriptions</a> |
-        <a href="{{ path('admin_sportmatches_index') }}">Gérer les matchs</a>
-    </nav>
 {% endblock %}
