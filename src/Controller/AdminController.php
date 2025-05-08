@@ -22,7 +22,7 @@ class AdminController extends AbstractController
         RegistrationRepository $registrationRepo,
         SportMatchRepository $sportMatchRepo
     ): Response {
-        $user = $this->security->getUser();
+        $user = $this->getUser();
     
         if (!$user) {
             throw $this->createAccessDeniedException('Vous devez être connecté pour accéder à cette page.');

@@ -14,10 +14,33 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/api/tournaments')]
 class RegistrationController extends AbstractController
 {
+    #[Route('/register', name: 'register', methods: ['POST'])]
+    public function register(Request $request, UserPasswordHasherInterface $passwordHasher, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+    
+        if (!$data || !isset($data['username'], $data['password'])) {
+            return new JsonResponse(['error' => 'Données incomplètes'], 400);
+        }
+    
+        $user = new User();
+        $user->setUsername($data['username']);
+        $user->setFirstName($data['firstName'] ?? '');
+        $user->setLastName($data['lastName'] ?? '');
+        $user->setEmailAddress($data['emailAddress'] ?? '');
+        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        $user->setStatus('actif');
+    
+        $em->persist($user);
+        $em->flush();
+    
+        return new JsonResponse(['message' => 'Utilisateur créé avec succès']);
+    }
     #[Route('/{id}/registrations', name: 'registration_index', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function index(Tournament $tournament, RegistrationRepository $repo, SerializerInterface $serializer): JsonResponse

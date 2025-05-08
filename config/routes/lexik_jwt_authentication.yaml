@@ -1,2 +1,5 @@
 api_login_check:
     path: /api/login_check
+    methods: [POST]
+    # ← on référence directement la classe + méthode
+    controller: Lexik\Bundle\JWTAuthenticationBundle\Controller\AuthenticationController::getToken
