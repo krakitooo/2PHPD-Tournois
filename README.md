@@ -131,9 +131,8 @@ Les **tests unitaires** sont présents dans `/tests` et couvrent :
 
 - Entité `User`,
 - Entité `Tournament`,
-- Commande `app:players:stats`,
-- Contrôleurs principaux.
-
+- Entité `SportMatch`
+  
 Exécution :
 
 ```bash
