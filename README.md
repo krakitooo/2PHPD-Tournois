@@ -1,20 +1,20 @@
-# 🎾 Plateforme de Gestion de Tournois de Sport
+# Plateforme de Gestion de Tournois de Sport
 
-## 📦 Présentation générale
+## Présentation générale
 
 Ce projet est une plateforme de gestion de tournois de sport, réalisée en Symfony 7. Il permet de :
 
-✅ Gérer des **tournois**,  
-✅ Gérer des **joueurs (utilisateurs)**,  
-✅ Gérer les **inscriptions** aux tournois,  
-✅ Gérer les **parties (matchs)**,  
-✅ Offrir une **interface d’administration** (dashboard) sécurisée,  
-✅ Offrir des **notifications** et une **API RESTful**.
+- Gérer des **tournois**,  
+- Gérer des **joueurs (utilisateurs)**,  
+- Gérer les **inscriptions** aux tournois,  
+- Gérer les **parties (matchs)**,  
+- Offrir une **interface d’administration** (dashboard) sécurisée,  
+- Offrir des **notifications** et une **API RESTful**.
 
 Le projet respecte les normes RESTful, inclut une interface admin en **Twig**, des **tests unitaires**, des **fixtures**, ainsi qu’une **commande Symfony personnalisée**.
 
 
-## 🚀 Installation
+## Installation
 
 1. **Récupérer le projet :**
 
@@ -49,7 +49,7 @@ openssl genrsa -aes256 -out config/jwt/private.pem 4096
 
 openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
 ```
-⚠️ Bien mettre la passphrase **Supinf0!** quand demandé
+Bien mettre la passphrase **Supinf0!** quand demandé
 
 
 6. **Charger les fixtures (données de test) :**
@@ -88,7 +88,7 @@ symfony server:start
 | PUT     | `/api/tournaments/{idTournament}/sport-matchs/{idSportMatchs}`   | Modifier les scores           |
 | DELETE  | `/api/tournaments/{idTournament}/sport-matchs/{idSportMatchs}`   | Supprimer un match            |
 
-✅ Authentification obligatoire (ROLE\_USER) sur l'API, sauf `/register`.
+Authentification obligatoire (ROLE\_USER) sur l'API, sauf `/register`.
 
 
 ## 🏛️ Interface d’administration (Dashboard)
@@ -105,16 +105,16 @@ Elle permet de :
 Toutes les pages utilisent **Twig** et un style custom.
 
 
-## 🔔 Notifications
+## Notifications
 
-✅ Notification envoyée aux participants d’un tournoi lorsque celui-ci est **remporté**.
+- Notification envoyée aux participants d’un tournoi lorsque celui-ci est **remporté**.
 
-✅ Notification envoyée à l’adversaire lorsqu’un joueur **met à jour son score** (si admin → pas de notif).
+- Notification envoyée à l’adversaire lorsqu’un joueur **met à jour son score** (si admin → pas de notif).
 
 Les notifications sont **stockées en BDD** et accessibles via `/api/notifications` pour l’utilisateur authentifié.
 
 
-## 🧩 Commande Symfony
+## Commande Symfony
 
 Une commande est disponible :
 
@@ -125,14 +125,14 @@ php bin/console app:player:stats {playerId} [tournamentId]
 Elle affiche le **nombre de victoires/défaites** d’un joueur globalement ou dans un tournoi donné.
 
 
-## 🧪 Tests unitaires
+## Tests unitaires
 
 Les **tests unitaires** sont présents dans `/tests` et couvrent :
 
-✅ Entité `User`,
-✅ Entité `Tournament`,
-✅ Commande `app:players:stats`,
-✅ Contrôleurs principaux.
+- Entité `User`,
+- Entité `Tournament`,
+- Commande `app:players:stats`,
+- Contrôleurs principaux.
 
 Exécution :
 
@@ -141,14 +141,14 @@ php bin/phpunit
 ```
 
 
-## 📝 Notes importantes
+## Notes importantes
 
 * Le **statut d’un tournoi** est dynamique et calculé lors des requêtes GET en fonction des dates.
 * Le **statut d’un match** est mis automatiquement à **"terminé"** si les deux scores sont renseignés.
 * Les **joueurs d’un match** doivent être **inscrits et confirmés** dans le tournoi concerné.
 
 
-## 👤 Authentification
+## Authentification
 
 Authentification basée sur **sessions** côté dashboard et **JWT tokens** côté API.  
 Clé publique/privée générée dans `/config/jwt`.
@@ -165,7 +165,7 @@ Mot de passe : adminpass
 ```
 
 
-## 🛠️ Technologies principales
+## Technologies principales
 
 * Symfony 7.x
 * Doctrine ORM
@@ -174,7 +174,7 @@ Mot de passe : adminpass
 * PHPUnit
 
 
-## 📝 Auteurs
+## Auteurs
 
 * Axel GIOVANNAI
 * Marvin LOUVEL
